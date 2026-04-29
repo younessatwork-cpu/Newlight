@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "python manage.py collectstatic --noinput && python manage.py migrate",
+  "functions": {
+    "api/index.py": {
+      "excludeFiles": "{.venv/**,venv/**,__pycache__/**,*.pyc,tests/**,media/**}"
+    }
+  },
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/staticfiles/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.py"
+    }
+  ]
+}
