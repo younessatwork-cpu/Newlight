@@ -1,0 +1,92 @@
+-- PostgreSQL schema equivalent to the Django migration.
+CREATE TABLE IF NOT EXISTS workers (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  tjm NUMERIC(12,2) NOT NULL,
+  specialty VARCHAR(150) NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS clients (
+  id SERIAL PRIMARY KEY,
+  client_name VARCHAR(180) NOT NULL,
+  work_type VARCHAR(180) NOT NULL DEFAULT '',
+  budget NUMERIC(14,2) NOT NULL DEFAULT 0,
+  advance NUMERIC(14,2) NOT NULL DEFAULT 0,
+  total_points INTEGER NOT NULL DEFAULT 0,
+  status VARCHAR(30) NOT NULL DEFAULT 'active'
+);
+
+CREATE TABLE IF NOT EXISTS labor_logs (
+  id SERIAL PRIMARY KEY,
+  date DATE NOT NULL,
+  client_name VARCHAR(180) NOT NULL,
+  worker_name VARCHAR(150) NOT NULL,
+  days NUMERIC(8,2) NOT NULL DEFAULT 0,
+  cost NUMERIC(14,2) NOT NULL DEFAULT 0,
+  phase VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS expenses (
+  id SERIAL PRIMARY KEY,
+  date DATE NOT NULL,
+  client_name VARCHAR(180) NOT NULL,
+  item VARCHAR(220) NOT NULL,
+  amount NUMERIC(14,2) NOT NULL DEFAULT 0,
+  phase VARCHAR(40) NOT NULL,
+  supplier VARCHAR(180) NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS progress (
+  client_name VARCHAR(180) PRIMARY KEY,
+  phase1 INTEGER NOT NULL DEFAULT 0,
+  phase2 INTEGER NOT NULL DEFAULT 0,
+  phase3 INTEGER NOT NULL DEFAULT 0,
+  phase4 INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS site_photos (
+  id SERIAL PRIMARY KEY,
+  upload_date TIMESTAMP WITH TIME ZONE NOT NULL,
+  client_name VARCHAR(180) NOT NULL,
+  phase VARCHAR(40) NOT NULL,
+  photo_data TEXT NOT NULL,
+  notes TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS inventory (
+  id SERIAL PRIMARY KEY,
+  item_name VARCHAR(220) NOT NULL,
+  category VARCHAR(120) NOT NULL DEFAULT '',
+  quantity NUMERIC(14,2) NOT NULL DEFAULT 0,
+  unit VARCHAR(40) NOT NULL DEFAULT 'pcs'
+);
+
+CREATE TABLE IF NOT EXISTS inventory_logs (
+  id SERIAL PRIMARY KEY,
+  date DATE NOT NULL,
+  item_name VARCHAR(220) NOT NULL,
+  change_amount NUMERIC(14,2) NOT NULL DEFAULT 0,
+  direction VARCHAR(5) NOT NULL,
+  site_allocated VARCHAR(180) NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS system_users (
+  username VARCHAR(80) PRIMARY KEY,
+  password_hash VARCHAR(64) NOT NULL,
+  role VARCHAR(30) NOT NULL,
+  reference VARCHAR(180) NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS payments (
+  id SERIAL PRIMARY KEY,
+  date DATE NOT NULL,
+  client_name VARCHAR(180) NOT NULL,
+  amount NUMERIC(14,2) NOT NULL DEFAULT 0,
+  method VARCHAR(80) NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT ''
+);
+
+INSERT INTO system_users (username, password_hash, role, reference)
+VALUES ('admin', '04445e6487736590d1ef50186b414e737e0164683cbbec64e00e73c000fd3bef', 'Admin', 'Newlightemara')
+ON CONFLICT (username) DO NOTHING;

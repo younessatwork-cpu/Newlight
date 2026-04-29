@@ -1,0 +1,46 @@
+{% extends 'ops/base.html' %}
+{% load ops_tags %}
+{% block title %}Dashboard · Newlightemara{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div><p class="eyebrow">Command center</p><h1>Dashboard</h1><p>Contracts, collected cash, field cost, and profit performance.</p></div>
+</header>
+<section class="metrics five">
+  <article class="metric-card"><span>Contracts</span><strong>{{ totals.contracts|money }}</strong></article>
+  <article class="metric-card"><span>Collected</span><strong>{{ totals.collected|money }}</strong></article>
+  <article class="metric-card"><span>Labour</span><strong>{{ totals.labour|money }}</strong></article>
+  <article class="metric-card"><span>Materials</span><strong>{{ totals.materials|money }}</strong></article>
+  <article class="metric-card accent"><span>Profit · {{ totals.margin_pct|pct }}</span><strong>{{ totals.profit|money }}</strong></article>
+</section>
+<section class="grid two">
+  <article class="panel">
+    <div class="panel-head"><h2>Site performance</h2><input class="table-filter" data-table="site-table" placeholder="Filter sites..."></div>
+    <div class="table-wrap">
+      <table class="data-table" id="site-table">
+        <thead><tr><th>Site</th><th>Status</th><th>Progress</th><th>Labour</th><th>Materials</th><th>Profit</th></tr></thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            <td><strong>{{ row.client.client_name }}</strong><small>{{ row.client.work_type }}</small></td>
+            <td>{{ row.client.status|status_badge }}</td>
+            <td><div class="progress"><span style="width: {{ row.progress }}%"></span></div><small>{{ row.progress }}%</small></td>
+            <td>{{ row.labour|money }}</td><td>{{ row.materials|money }}</td><td>{{ row.profit|money }}</td>
+          </tr>
+          {% empty %}<tr><td colspan="6" class="empty">No sites yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+  <article class="panel">
+    <div class="panel-head"><h2>Spend breakdown</h2></div>
+    {% for phase, amount in spend_by_phase.items %}
+      <div class="phase-row"><span>{{ phase|phase_badge }}</span><strong>{{ amount|money }}</strong></div>
+    {% endfor %}
+    <hr>
+    <h2>Recent activity</h2>
+    <div class="activity-list">
+      {% for a in recent %}<div><span class="badge badge-gray">{{ a.type }}</span><p>{{ a.text }}</p><strong>{{ a.amount|money }}</strong><small>{{ a.date }}</small></div>{% empty %}<p class="empty">No activity yet.</p>{% endfor %}
+    </div>
+  </article>
+</section>
+{% endblock %}

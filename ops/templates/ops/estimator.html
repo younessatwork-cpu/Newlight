@@ -1,0 +1,44 @@
+{% extends 'ops/base.html' %}
+{% load ops_tags %}
+{% block title %}Smart Estimator · Newlightemara{% endblock %}
+{% block content %}
+<header class="page-header"><div><p class="eyebrow">Pricing intelligence</p><h1>Smart Estimator</h1><p>Historical cost-per-point pricing with margin-based quote calculation.</p></div></header>
+<section class="grid two">
+  <article class="panel">
+    <h2>Estimate a project</h2>
+    <form method="post" class="form-grid">
+      {% csrf_token %}
+      <label>Project name<input name="project_name" required></label>
+      <label>Points<input name="points" type="number" min="0" required></label>
+      <label>Surface (m²)<input name="surface" type="number" step="0.01"></label>
+      <label>Margin %<input name="margin" type="number" step="0.01" value="25" required></label>
+      <fieldset class="span-2 checks"><legend>Work types</legend>
+        <label><input type="checkbox" name="work_types" value="Residential"> Residential</label>
+        <label><input type="checkbox" name="work_types" value="Commercial"> Commercial</label>
+        <label><input type="checkbox" name="work_types" value="Renovation"> Renovation</label>
+        <label><input type="checkbox" name="work_types" value="Tableau électrique"> Tableau électrique</label>
+      </fieldset>
+      <button class="btn primary" type="submit">Calculate quote</button>
+    </form>
+  </article>
+  <article class="panel result-card">
+    <h2>Recommended price</h2>
+    <div class="metrics single">
+      <article class="metric-card"><span>Historical cost / point</span><strong>{{ cost_per_point|money }}</strong></article>
+    </div>
+    {% if result %}
+      <div class="quote-box">
+        <span>Recommended quote</span><strong>{{ result.quote|money }}</strong>
+        <p>Base cost: {{ result.base_cost|money }} · Margin: {{ result.margin }}%</p>
+        <a class="btn secondary" href="{% url 'estimator_pdf' %}?project={{ result.project_name|urlencode }}&points={{ result.points }}&margin={{ result.margin }}&base={{ result.base_cost }}&quote={{ result.quote }}">Export PDF quote</a>
+      </div>
+    {% else %}<p class="empty">Run the estimator to generate a quote PDF.</p>{% endif %}
+  </article>
+</section>
+<section class="panel">
+  <div class="panel-head"><h2>Historical cost reference</h2><input class="table-filter" data-table="history-table" placeholder="Filter..."></div>
+  <div class="table-wrap"><table class="data-table" id="history-table"><thead><tr><th>Site</th><th>Work type</th><th>Points</th><th>Total cost</th><th>Cost / point</th></tr></thead><tbody>
+  {% for row in historical %}<tr><td>{{ row.client.client_name }}</td><td>{{ row.client.work_type }}</td><td>{{ row.client.total_points }}</td><td>{{ row.total_cost|money }}</td><td>{{ row.cpp|money }}</td></tr>{% empty %}<tr><td colspan="5" class="empty">No historical projects yet.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

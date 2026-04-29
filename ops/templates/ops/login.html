@@ -1,0 +1,27 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login · Newlightemara</title>
+  <link rel="stylesheet" href="{% static 'ops/css/app.css' %}">
+</head>
+<body class="login-body">
+  <section class="login-card">
+    <div class="login-logo">⚡</div>
+    <h1>Newlightemara</h1>
+    <p>Secure field-operations management</p>
+    {% if messages %}
+      {% for message in messages %}<div class="toast {{ message.tags }}">{{ message }}</div>{% endfor %}
+    {% endif %}
+    <form method="post" class="form-grid single">
+      {% csrf_token %}
+      <label>Username<input name="username" autocomplete="username" required></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="btn primary" type="submit">Login</button>
+    </form>
+    <small class="muted">Seeded admin: <code>admin</code> / <code>Admin2026!</code></small>
+  </section>
+</body>
+</html>

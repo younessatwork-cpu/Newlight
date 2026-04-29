@@ -1,0 +1,32 @@
+{% extends 'ops/base.html' %}
+{% load ops_tags %}
+{% block title %}Client Portfolios · Newlightemara{% endblock %}
+{% block content %}
+<header class="page-header"><div><p class="eyebrow">Admin</p><h1>Client Portfolios</h1><p>Every site is editable and deletable from this interface.</p></div></header>
+<section class="panel">
+  <h2>Add new site</h2>
+  <form method="post" class="form-grid">
+    {% csrf_token %}<input type="hidden" name="action" value="add">
+    <label>Client / site name<input name="client_name" required></label>
+    <label>Work type<input name="work_type"></label>
+    <label>Budget<input name="budget" type="number" step="0.01" required></label>
+    <label>Advance<input name="advance" type="number" step="0.01" value="0"></label>
+    <label>Total points<input name="total_points" type="number" value="0"></label>
+    <label>Status<select name="status"><option value="active">Active</option><option value="completed">Completed</option><option value="paused">Paused</option><option value="cancelled">Cancelled</option></select></label>
+    <button class="btn primary" type="submit">Create portfolio</button>
+  </form>
+</section>
+<section class="panel">
+  <div class="panel-head"><h2>All sites</h2><input class="table-filter" data-table="clients-table" placeholder="Filter clients..."></div>
+  <div class="table-wrap"><table class="data-table" id="clients-table"><thead><tr><th>Client</th><th>Status</th><th>Budget</th><th>Collected</th><th>Outstanding</th><th>Total cost</th><th>Actions</th></tr></thead><tbody>
+  {% for row in rows %}<tr>
+    <td><strong>{{ row.client.client_name }}</strong><small>{{ row.client.work_type }} · {{ row.client.total_points }} points</small></td><td>{{ row.client.status|status_badge }}</td><td>{{ row.client.budget|money }}</td><td>{{ row.client.advance|money }}</td><td>{{ row.outstanding|money }}</td><td>{{ row.total_cost|money }}</td>
+    <td class="actions"><button class="btn mini" data-open="edit-client-{{ row.client.id }}">Edit</button><button class="btn mini success" data-open="pay-client-{{ row.client.id }}">Payment</button><form method="post" class="inline">{% csrf_token %}<input type="hidden" name="action" value="complete"><input type="hidden" name="id" value="{{ row.client.id }}"><button class="btn mini secondary">Completed</button></form><button class="btn mini danger" data-open="delete-client-{{ row.client.id }}">Delete</button></td>
+  </tr>
+  <dialog id="edit-client-{{ row.client.id }}"><form method="post" class="form-grid modal-form">{% csrf_token %}<input type="hidden" name="action" value="edit"><input type="hidden" name="id" value="{{ row.client.id }}"><h2 class="span-2">Edit {{ row.client.client_name }}</h2><label>Name<input name="client_name" value="{{ row.client.client_name }}" required></label><label>Work type<input name="work_type" value="{{ row.client.work_type }}"></label><label>Budget<input name="budget" type="number" step="0.01" value="{{ row.client.budget }}"></label><label>Advance<input name="advance" type="number" step="0.01" value="{{ row.client.advance }}"></label><label>Points<input name="total_points" type="number" value="{{ row.client.total_points }}"></label><label>Status<select name="status"><option value="active" {% if row.client.status == 'active' %}selected{% endif %}>Active</option><option value="completed" {% if row.client.status == 'completed' %}selected{% endif %}>Completed</option><option value="paused" {% if row.client.status == 'paused' %}selected{% endif %}>Paused</option><option value="cancelled" {% if row.client.status == 'cancelled' %}selected{% endif %}>Cancelled</option></select></label><button class="btn primary">Save changes</button><button type="button" class="btn" data-close>Cancel</button></form></dialog>
+  <dialog id="pay-client-{{ row.client.id }}"><form method="post" class="form-grid modal-form">{% csrf_token %}<input type="hidden" name="action" value="payment"><input type="hidden" name="client_id" value="{{ row.client.id }}"><h2 class="span-2">Collect payment</h2><label>Date<input name="date" type="date" value="{% now 'Y-m-d' %}"></label><label>Amount<input name="amount" type="number" step="0.01" max="{{ row.outstanding }}" required></label><label>Method<input name="method" placeholder="Cash, bank, cheque"></label><label>Notes<input name="notes"></label><button class="btn success">Save payment</button><button type="button" class="btn" data-close>Cancel</button></form></dialog>
+  <dialog id="delete-client-{{ row.client.id }}"><form method="post" class="modal-form">{% csrf_token %}<input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ row.client.id }}"><h2>Delete {{ row.client.client_name }}?</h2><p>This also removes related logs, photos, progress, payments, and expenses.</p><button class="btn danger">Yes, delete</button><button type="button" class="btn" data-close>Cancel</button></form></dialog>
+  {% empty %}<tr><td colspan="7" class="empty">No client portfolios yet.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

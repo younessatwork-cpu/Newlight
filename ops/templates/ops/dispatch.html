@@ -1,0 +1,8 @@
+{% extends 'ops/base.html' %}
+{% load ops_tags %}
+{% block title %}Dispatch · Newlightemara{% endblock %}
+{% block content %}
+<header class="page-header"><div><p class="eyebrow">Assignments</p><h1>Dispatch</h1><p>Generate WhatsApp/SMS-ready assignment messages and monitor worker load.</p></div></header>
+<section class="grid two"><article class="panel"><h2>Assignment form</h2><form method="post" class="form-grid single">{% csrf_token %}<label>Worker<select name="worker_id">{% for w in workers %}<option value="{{ w.id }}">{{ w.name }}</option>{% endfor %}</select></label><label>Site<select name="client_id">{% for c in clients %}<option value="{{ c.id }}">{{ c.client_name }}</option>{% endfor %}</select></label><label>Phase<select name="phase">{% for p in phases %}<option>{{ p }}</option>{% endfor %}</select></label><label>Channel<select name="channel"><option>WhatsApp</option><option>SMS</option></select></label><button class="btn primary">Generate message</button></form></article><article class="panel"><h2>Generated message</h2>{% if message %}<textarea class="message-box" readonly>{{ message }}</textarea><button class="btn secondary copy-btn" data-copy="{{ message }}">Copy message</button>{% else %}<p class="empty">Generate a dispatch message.</p>{% endif %}</article></section>
+<section class="worker-grid">{% for card in worker_cards %}<article class="worker-card"><strong>{{ card.worker.name }}</strong><span>{{ card.worker.specialty }}</span><p>{{ card.days }} logged days</p><small>{{ card.recent_cost|money }} total labour cost</small></article>{% empty %}<article class="panel empty">No workers configured.</article>{% endfor %}</section>
+{% endblock %}

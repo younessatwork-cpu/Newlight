@@ -1,0 +1,69 @@
+{% load static ops_tags %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Newlightemara Operations{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'ops/css/app.css' %}">
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script defer src="{% static 'ops/js/app.js' %}"></script>
+</head>
+<body class="app-body">
+  <aside class="sidebar">
+    <a class="brand" href="{% url 'dashboard' %}">
+      <div class="brand-mark">⚡</div>
+      <div>
+        <strong>Newlightemara</strong>
+        <span>Field Operations</span>
+      </div>
+    </a>
+    <div class="user-box">
+      <span class="avatar">{{ session_user.username|slice:':1'|upper }}</span>
+      <div>
+        <strong>{{ session_user.username }}</strong>
+        <small>{{ session_user.role }}{% if session_user.reference %} · {{ session_user.reference }}{% endif %}</small>
+      </div>
+    </div>
+    <nav class="nav">
+      {% if is_admin %}
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'estimator' %}">Smart Estimator</a>
+        <a href="{% url 'clients' %}">Client Portfolios</a>
+        <a href="{% url 'timesheets' %}">Timesheets</a>
+        <a href="{% url 'payroll' %}">Payroll</a>
+        <a href="{% url 'efficiency' %}">Efficiency Matrix</a>
+        <a href="{% url 'procurement' %}">Procurement</a>
+        <a href="{% url 'milestones' %}">Milestones</a>
+        <a href="{% url 'photos' %}">Site Photos</a>
+        <a href="{% url 'warehouse' %}">Warehouse</a>
+        <a href="{% url 'invoicing' %}">Invoicing</a>
+        <a href="{% url 'dispatch' %}">Dispatch</a>
+        <a href="{% url 'settings' %}">Settings</a>
+      {% elif is_technician %}
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'timesheets' %}">Timesheets</a>
+        <a href="{% url 'photos' %}">Site Photos</a>
+      {% elif is_client %}
+        <a href="{% url 'vip_portal' %}">VIP Portal</a>
+      {% endif %}
+    </nav>
+    <a class="logout" href="{% url 'logout' %}">Logout</a>
+  </aside>
+  <main class="main">
+    <div class="mobile-top">
+      <strong>⚡ Newlightemara</strong>
+      <a href="{% url 'logout' %}">Logout</a>
+    </div>
+    {% if messages %}
+      <div class="toast-stack">
+        {% for message in messages %}
+          <div class="toast {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  {% if rain_money %}<script>window.NEWLIGHT_RAIN_MONEY = true;</script>{% endif %}
+</body>
+</html>

@@ -1,0 +1,13 @@
+{% extends 'ops/base.html' %}
+{% load ops_tags %}
+{% block title %}Efficiency Matrix · Newlightemara{% endblock %}
+{% block content %}
+<header class="page-header"><div><p class="eyebrow">Operational analytics</p><h1>Efficiency Matrix</h1><p>Worker/phase and site/phase pivots with daily cost trend.</p></div></header>
+<section class="panel"><h2>Daily labour cost line chart</h2><canvas id="dailyCostChart" height="120"></canvas></section>
+<script type="application/json" id="chart-labels">{{ chart_labels|safe }}</script>
+<script type="application/json" id="chart-values">{{ chart_values|safe }}</script>
+<section class="grid two">
+  <article class="panel"><h2>Worker × phase</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Worker</th>{% for p in phases %}<th>{{ p }}</th>{% endfor %}</tr></thead><tbody>{% for worker, vals in worker_phase.items %}<tr><td>{{ worker }}</td>{% for p in phases %}<td>{{ vals|get_item:p|money }}</td>{% endfor %}</tr>{% empty %}<tr><td colspan="5" class="empty">No labour data.</td></tr>{% endfor %}</tbody></table></div></article>
+  <article class="panel"><h2>Site × phase</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Site</th>{% for p in phases %}<th>{{ p }}</th>{% endfor %}</tr></thead><tbody>{% for site, vals in site_phase.items %}<tr><td>{{ site }}</td>{% for p in phases %}<td>{{ vals|get_item:p|money }}</td>{% endfor %}</tr>{% empty %}<tr><td colspan="5" class="empty">No site data.</td></tr>{% endfor %}</tbody></table></div></article>
+</section>
+{% endblock %}
